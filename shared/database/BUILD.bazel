@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "database.go",
         "inmemory.go",
+        "ethbbolt.go",
     ],
     importpath = "github.com/prysmaticlabs/prysm/shared/database",
     visibility = ["//visibility:public"],
@@ -20,10 +21,7 @@ go_test(
     srcs = [
         "database_test.go",
         "inmemory_test.go",
+        "ethbbold_test.go",
     ],
     embed = [":go_default_library"],
-    deps = [
-        "@com_github_ethereum_go_ethereum//ethdb:go_default_library",
-        "@com_github_etcd-io_bbolt//:go_default_library",
-    ],
 )

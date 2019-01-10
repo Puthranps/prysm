@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/etcd-io/bbolt"
 	"github.com/sirupsen/logrus"
+  "github.com/prysmaticlabs/prysm/ethbbolt"
 )
 
 var log = logrus.WithField("prefix", "db")
 
 // DB defines a service for the beacon chain system's persistent storage.
 type DB struct {
-	_db ethdb.Database
+	_db ethbbolt.EDB
 }
 
 // DBConfig specifies configuration options for the db service.
@@ -33,7 +33,7 @@ func NewDB(config *DBConfig) (*DB, error) {
 		return db, nil
 	}
 
-	_db, err := ethdb.NewLDBDatabase(filepath.Join(config.DataDir, config.Name), 16, 16)
+	_db, err := ethbbolt.NewBBDatabase(filepath.Join(config.DataDir, config.Name), 16, 16)
 	if err != nil {
 		log.Error(fmt.Sprintf("Could not start beaconDB: %v", err))
 		return nil, err
@@ -49,6 +49,14 @@ func (b *DB) Close() {
 }
 
 // DB returns the attached ethdb instance.
-func (b *DB) DB() ethdb.Database {
+func (b *DB) DB() ethbbolt.EDB {
 	return b._db
 }
+
+// calls
+// ethbbolt.NewBBoltDatabase
+
+// types
+// Database
+  // .Close()
+//
