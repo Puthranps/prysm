@@ -93,12 +93,12 @@ func (db *BBDatabase) Put(tx *bolt.Tx) error {
 	return db.db.Put(key, value, nil)
 }
 
-func (db *LDBDatabase) Has(key []byte) (bool, error) {
+func (db *BBDatabase) Has(key []byte) (bool, error) {
 	return db.db.Has(key, nil)
 }
 
 // Get returns the given key if it's present.
-func (db *LDBDatabase) Get(key []byte) ([]byte, error) {
+func (db *BBDatabase) Get(key []byte) ([]byte, error) {
 	dat, err := db.db.Get(key, nil)
 	if err != nil {
 		return nil, err
@@ -141,7 +141,7 @@ func (db *BBDatabase) Close() {
 	}
 }
 
-func (db *BBDatabase) LDB() *leveldb.DB {
+func (db *BBDatabase) BBD() * {
 	return db.db
 }
 
@@ -181,7 +181,7 @@ func (db *BBDatabase) Meter(prefix string) {
 //
 // This is how the iostats look like (currently):
 // Read(MB):3895.04860 Write(MB):3654.64712
-func (db *LDBDatabase) meter(refresh time.Duration) {
+func (db *BBDatabase) meter(refresh time.Duration) {
 	// Create the counters to store current and previous compaction values
 	compactions := make([][]float64, 2)
 	for i := 0; i < 2; i++ {
@@ -338,7 +338,7 @@ func (db *LDBDatabase) meter(refresh time.Duration) {
 	errc <- merr
 }
 
-func (db *LDBDatabase) NewBatch() Batch {
+func (db *BBDatabase) NewBatch() Batch {
 	return &ldbBatch{db: db.db, b: new(leveldb.Batch)}
 }
 
