@@ -141,7 +141,7 @@ func (db *BBDatabase) Close() {
 	}
 }
 
-func (db *BBDatabase) BBD() * {
+func (db *BBDatabase) LDB() *bolt.DB {
 	return db.db
 }
 
@@ -339,36 +339,36 @@ func (db *BBDatabase) meter(refresh time.Duration) {
 }
 
 func (db *BBDatabase) NewBatch() Batch {
-	return &ldbBatch{db: db.db, b: new(leveldb.Batch)}
+	return &bbBatch{db: db.db, b: new(leveldb.Batch)}
 }
 
-type ldbBatch struct {
-	db   *leveldb.DB
-	b    *leveldb.Batch
+type bbBatch struct {
+	db   *bolt.DB
+	b    *bolt.Batch
 	size int
 }
 
-func (b *ldbBatch) Put(key, value []byte) error {
+func (b *bbBatch) Put(key, value []byte) error {
 	b.b.Put(key, value)
 	b.size += len(value)
 	return nil
 }
 
-func (b *ldbBatch) Delete(key []byte) error {
+func (b *bbBatch) Delete(key []byte) error {
 	b.b.Delete(key)
 	b.size += 1
 	return nil
 }
 
-func (b *ldbBatch) Write() error {
+func (b *bbBatch) Write() error {
 	return b.db.Write(b.b, nil)
 }
 
-func (b *ldbBatch) ValueSize() int {
+func (b *bbBatch) ValueSize() int {
 	return b.size
 }
 
-func (b *ldbBatch) Reset() {
+func (b *bbBatch) Reset() {
 	b.b.Reset()
 	b.size = 0
 }
