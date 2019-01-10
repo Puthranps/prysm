@@ -24,7 +24,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-  "os"
+  	"os"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
@@ -37,7 +37,7 @@ const (
 
 var OpenFileLimit = 64
 
-type LDBDatabase struct {
+type BBDatabase struct {
 	fn string      // filename for reporting
 	db *bbolt.DB // BBolt instance
 
@@ -55,7 +55,7 @@ type LDBDatabase struct {
 	log log.Logger // Contextual logger tracking the database path
 }
 
-// NewLDBDatabase returns a LevelDB wrapped object.
+// NewBBDatabase returns a BBOLT(BoltDB) wrapped object.
 func NewBBDatabase(file string, cache int, handles int) (*BBDatabase, error) {
 	logger := log.New("database", file)
 
@@ -107,20 +107,20 @@ func (db *LDBDatabase) Get(key []byte) ([]byte, error) {
 }
 
 // Delete deletes the key from the queue and database
-func (db *LDBDatabase) Delete(key []byte) error {
+func (db *BBDatabase) Delete(key []byte) error {
 	return db.db.Delete(key, nil)
 }
 
-func (db *LDBDatabase) NewIterator() iterator.Iterator {
+func (db *BBDatabase) NewIterator() iterator.Iterator {
 	return db.db.NewIterator(nil, nil)
 }
 
 // NewIteratorWithPrefix returns a iterator to iterate over subset of database content with a particular prefix.
-func (db *LDBDatabase) NewIteratorWithPrefix(prefix []byte) iterator.Iterator {
+func (db *BBDatabase) NewIteratorWithPrefix(prefix []byte) iterator.Iterator {
 	return db.db.NewIterator(util.BytesPrefix(prefix), nil)
 }
 
-func (db *LDBDatabase) Close() {
+func (db *BBDatabase) Close() {
 	// Stop the metrics collection to avoid internal database races
 	db.quitLock.Lock()
 	defer db.quitLock.Unlock()
@@ -141,12 +141,12 @@ func (db *LDBDatabase) Close() {
 	}
 }
 
-func (db *LDBDatabase) LDB() *leveldb.DB {
+func (db *BBDatabase) LDB() *leveldb.DB {
 	return db.db
 }
 
 // Meter configures the database metrics collectors and
-func (db *LDBDatabase) Meter(prefix string) {
+func (db *BBDatabase) Meter(prefix string) {
 	// Initialize all the metrics collector at the requested prefix
 	db.compTimeMeter = metrics.NewRegisteredMeter(prefix+"compact/time", nil)
 	db.compReadMeter = metrics.NewRegisteredMeter(prefix+"compact/input", nil)
