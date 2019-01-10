@@ -16,7 +16,7 @@
 
 // +build !js
 
-package ethdb
+package ethbbolt
 
 import (
 	"fmt"
@@ -24,15 +24,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+  "os"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/errors"
-	"github.com/syndtr/goleveldb/leveldb/filter"
-	"github.com/syndtr/goleveldb/leveldb/iterator"
-	"github.com/syndtr/goleveldb/leveldb/opt"
-	"github.com/syndtr/goleveldb/leveldb/util"
+  bolt "github.com/etcd-io/bbolt"
 )
 
 const (
@@ -43,7 +39,7 @@ var OpenFileLimit = 64
 
 type LDBDatabase struct {
 	fn string      // filename for reporting
-	db *leveldb.DB // LevelDB instance
+	db *bbolt.DB // BBolt instance
 
 	compTimeMeter    metrics.Meter // Meter for measuring the total time spent in database compaction
 	compReadMeter    metrics.Meter // Meter for measuring the data read during compaction
@@ -60,7 +56,7 @@ type LDBDatabase struct {
 }
 
 // NewLDBDatabase returns a LevelDB wrapped object.
-func NewLDBDatabase(file string, cache int, handles int) (*LDBDatabase, error) {
+func NewBBDatabase(file string, cache int, handles int) (*BBDatabase, error) {
 	logger := log.New("database", file)
 
 	// Ensure we have some minimal caching and file guarantees
@@ -73,20 +69,13 @@ func NewLDBDatabase(file string, cache int, handles int) (*LDBDatabase, error) {
 	logger.Info("Allocated cache and file handles", "cache", cache, "handles", handles)
 
 	// Open the db and recover any potential corruptions
-	db, err := leveldb.OpenFile(file, &opt.Options{
-		OpenFilesCacheCapacity: handles,
-		BlockCacheCapacity:     cache / 2 * opt.MiB,
-		WriteBuffer:            cache / 4 * opt.MiB, // Two of these are used internally
-		Filter:                 filter.NewBloomFilter(10),
-	})
-	if _, corrupted := err.(*errors.ErrCorrupted); corrupted {
-		db, err = leveldb.RecoverFile(file, nil)
-	}
+	db, err := bolt.Open(file, 0600, nil)
+
 	// (Re)check for errors and abort if opening of the db failed
 	if err != nil {
 		return nil, err
 	}
-	return &LDBDatabase{
+	return &BBDatabase{
 		fn:  file,
 		db:  db,
 		log: logger,
@@ -94,12 +83,13 @@ func NewLDBDatabase(file string, cache int, handles int) (*LDBDatabase, error) {
 }
 
 // Path returns the path to the database directory.
-func (db *LDBDatabase) Path() string {
+func (db *BBDatabase) Path() string {
 	return db.fn
 }
 
 // Put puts the given key / value to the queue
-func (db *LDBDatabase) Put(key []byte, value []byte) error {
+func (db *BBDatabase) Put(key []byte, value []byte) error {
+func (db *BBDatabase) Put(tx *bolt.Tx) error {
 	return db.db.Put(key, value, nil)
 }
 
