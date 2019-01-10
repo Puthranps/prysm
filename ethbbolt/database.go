@@ -141,7 +141,7 @@ func (db *BBDatabase) Close() {
 	}
 }
 
-func (db *BBDatabase) LDB() *bolt.DB {
+func (db *BBDatabase) EDB() *bolt.DB {
 	return db.db
 }
 
@@ -339,7 +339,7 @@ func (db *BBDatabase) meter(refresh time.Duration) {
 }
 
 func (db *BBDatabase) NewBatch() Batch {
-	return &bbBatch{db: db.db, b: new(leveldb.Batch)}
+	return &bbBatch{db: db.db, b: new(bolt.Batch)}
 }
 
 type bbBatch struct {
