@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/etcd-io/bbolt"
 	"github.com/sirupsen/logrus"
 )
 
