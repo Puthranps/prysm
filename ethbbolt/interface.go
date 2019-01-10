@@ -22,7 +22,7 @@ const IdealBatchSize = 100 * 1024
 
 // Putter wraps the database write operation supported by both batches and regular databases.
 type Putter interface {
-	Put(key []byte, value []byte) error
+	Put(tx *bolt.Tx, []byte bnkey []byte, value []byte) error
 }
 
 // Deleter wraps the database delete operation supported by both batches and regular databases.
