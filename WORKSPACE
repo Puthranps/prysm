@@ -144,6 +144,14 @@ go_repository(
 )
 
 go_repository(
+    name = "com_github_etcd-io_bbolt",
+    importpath = "github.com/etcd-io/bbolt",
+    remote = "https://github.com/etcd-io/bbolt",
+    vcs = "git",
+    commit = "7ee3ded59d4835e10f3e7d0f7603c42aa5e83820",
+)
+
+go_repository(
     name = "com_github_go_yaml_yaml",
     tag = "v2.2.2",
     importpath = "github.com/go-yaml/yaml",
